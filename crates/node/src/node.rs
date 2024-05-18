@@ -3,7 +3,7 @@ use std::sync::Arc;
 use crate::config::NodeConfig;
 use crate::handlers::LiveObjectHandler;
 use ramd_db::storage::Storage;
-use ramd_processor::{Action, CreateLiveObjectAction, Message, Processor};
+use ramd_processor::{Action, CreateLiveObjectAction, ExecuteLiveObjectAction, Message, Processor};
 use tracing::info;
 
 pub struct Node<S>
@@ -35,6 +35,21 @@ where
 
         // TODO: log message ID.
         info!(target: "ramd::node", "New message with create action");
+
+        self.processor.process_messages(&messages);
+    }
+
+    fn execute_live_object(&self, live_object_id: String, method: String, args: Vec<u8>) {
+        let messages = vec![Message {
+            action: Action::ExecuteLiveObject(ExecuteLiveObjectAction {
+                live_object_id,
+                method,
+                args,
+            }),
+        }];
+
+        // TODO: log message ID.
+        info!(target: "ramd::node", "New message with execute action");
 
         self.processor.process_messages(&messages);
     }

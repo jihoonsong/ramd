@@ -21,3 +21,10 @@ impl CreateLiveObject {
         }
     }
 }
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ExecuteLiveObject {
+    pub live_object_id: String,
+    pub method: String,
+    pub args: String,
+}
