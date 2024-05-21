@@ -32,7 +32,7 @@ type MemorySlicePtrBytes = [u8; size_of::<MemorySlice>()];
 
 impl MemorySlice {
     /// Read in a `MemorySlice` from the WASM (guest) memory and return it.
-    pub fn new(memory: &wasmer::MemoryView, ptr: u32) -> Result<MemorySlice, MemoryError> {
+    pub fn new(memory: &wasmer::MemoryView, ptr: u32) -> eyre::Result<MemorySlice, MemoryError> {
         let wasm_ptr = WasmPtr::<MemorySlicePtrBytes>::new(ptr);
         let memory_slice_ptr_bytes = wasm_ptr
             .deref(memory)
@@ -46,7 +46,7 @@ impl MemorySlice {
     }
 
     /// Write the given data to the memory slice.
-    pub fn write(self, memory: &wasmer::MemoryView, data: &[u8]) -> Result<(), MemoryError> {
+    pub fn write(self, memory: &wasmer::MemoryView, data: &[u8]) -> eyre::Result<(), MemoryError> {
         if data.len() > self.len as usize {
             return Err(MemoryError::ExceedsMemorySize);
         }
@@ -59,7 +59,11 @@ impl MemorySlice {
     }
 
     /// Read the memory slice.
-    pub fn read(self, memory: &wasmer::MemoryView, max_len: usize) -> Result<Vec<u8>, MemoryError> {
+    pub fn read(
+        self,
+        memory: &wasmer::MemoryView,
+        max_len: usize,
+    ) -> eyre::Result<Vec<u8>, MemoryError> {
         if self.len as usize > max_len {
             return Err(MemoryError::ExceedsMemorySize);
         }
@@ -81,7 +85,7 @@ impl MemorySlice {
     }
 
     /// Validate the memory slice.
-    fn validate(memory_slice: &MemorySlice) -> Result<(), MemoryError> {
+    fn validate(memory_slice: &MemorySlice) -> eyre::Result<(), MemoryError> {
         if memory_slice.ptr == 0 {
             return Err(MemoryError::NullPointer);
         }
