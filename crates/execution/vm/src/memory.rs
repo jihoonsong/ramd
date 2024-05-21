@@ -1,11 +1,11 @@
 use std::mem::size_of;
-use wasmer::WasmPtr;
+use wasmer::{MemoryAccessError, WasmPtr};
 
 #[derive(Debug)]
 pub enum MemoryError {
     ExceedsMemorySize,
-    ReadError,
-    WriteError,
+    ReadError(MemoryAccessError),
+    WriteError(MemoryAccessError),
     NullPointer,
 }
 
@@ -37,7 +37,7 @@ impl MemorySlice {
         let memory_slice_ptr_bytes = wasm_ptr
             .deref(memory)
             .read()
-            .map_err(|_err| MemoryError::ReadError)?;
+            .map_err(|err| MemoryError::ReadError(err))?;
         let memory_slice = MemorySlice::from_memory_slice_ptr_bytes(memory_slice_ptr_bytes);
 
         MemorySlice::validate(&memory_slice)?;
@@ -53,7 +53,7 @@ impl MemorySlice {
 
         memory
             .write(self.ptr as u64, data)
-            .map_err(|_err| MemoryError::WriteError)?;
+            .map_err(|err| MemoryError::WriteError(err))?;
 
         Ok(())
     }
@@ -71,7 +71,7 @@ impl MemorySlice {
         let mut data = vec![0u8; self.len as usize];
         memory
             .read(self.ptr as u64, &mut data)
-            .map_err(|_err| MemoryError::ReadError)?;
+            .map_err(|err| MemoryError::ReadError(err))?;
 
         Ok(data)
     }
