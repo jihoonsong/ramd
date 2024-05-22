@@ -3,7 +3,6 @@ members = [
     "crates/config",
     "crates/execution/processor",
     "crates/execution/vm",
-    "crates/execution/vm-runtime",
     "crates/p2p/p2p-server",
     "crates/p2p/p2p-types",
     "crates/node",
@@ -38,7 +37,6 @@ ramd-p2p-server ={ path = "crates/p2p/p2p-server"}
 ramd-p2p-types ={ path = "crates/p2p/p2p-types"}
 ramd-processor = { path = "crates/execution/processor" }
 ramd-vm = { path = "crates/execution/vm" }
-ramd-vm-runtime = { path = "crates/execution/vm-runtime" }
 ramd-node = { path = "crates/node" }
 ramd-jsonrpc = { path = "crates/rpc/jsonrpc" }
 ramd-jsonrpc-api = { path = "crates/rpc/jsonrpc-api" }

@@ -8,7 +8,7 @@ use tracing::info;
 
 pub struct Node<S>
 where
-    S: Storage<Vec<u8>, Vec<u8>>,
+    S: Storage<Vec<u8>, Vec<u8>> + 'static,
 {
     processor: Processor<S>,
 }

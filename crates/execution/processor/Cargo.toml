@@ -9,7 +9,6 @@ description = ""
 [dependencies]
 ramd-db.workspace = true
 ramd-vm.workspace = true
-ramd-vm-runtime.workspace = true
 
 eyre.workspace = true
 tracing.workspace = true

@@ -3497,7 +3497,6 @@ dependencies = [
  "eyre",
  "ramd-db",
  "ramd-vm",
- "ramd-vm-runtime",
  "serde",
  "serde_json",
  "tracing",
@@ -3523,16 +3522,6 @@ dependencies = [
  "ramd-db",
  "tracing",
  "wasmer",
-]
-
-[[package]]
-name = "ramd-vm-runtime"
-version = "0.1.0"
-dependencies = [
- "eyre",
- "ramd-db",
- "ramd-vm",
- "tracing",
 ]
 
 [[package]]

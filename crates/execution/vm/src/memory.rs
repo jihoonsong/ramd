@@ -1,21 +1,30 @@
 use std::mem::size_of;
+
+use crate::MAX_WASM_MEMORY_SIZE;
 use wasmer::{MemoryAccessError, WasmPtr};
 
 #[derive(Debug)]
-pub enum MemoryError {
-    ExceedsMemorySize,
+pub enum MemorySliceError {
+    ExceedMaxWASMMemorySize,
+    ExceedMemorySliceSize,
     ReadError(MemoryAccessError),
     WriteError(MemoryAccessError),
     NullPointer,
 }
 
-impl std::fmt::Display for MemoryError {
+impl std::fmt::Display for MemorySliceError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{:?}", self)
     }
 }
 
-impl std::error::Error for MemoryError {}
+impl std::error::Error for MemorySliceError {}
+
+impl From<MemorySliceError> for wasmer::RuntimeError {
+    fn from(err: MemorySliceError) -> Self {
+        wasmer::RuntimeError::new(err.to_string())
+    }
+}
 
 /// A block of memory in the WASM (guest) memory.
 pub struct MemorySlice {
@@ -32,12 +41,15 @@ type MemorySlicePtrBytes = [u8; size_of::<MemorySlice>()];
 
 impl MemorySlice {
     /// Read in a `MemorySlice` from the WASM (guest) memory and return it.
-    pub fn new(memory: &wasmer::MemoryView, ptr: u32) -> eyre::Result<MemorySlice, MemoryError> {
+    pub fn new(
+        memory: &wasmer::MemoryView,
+        ptr: u32,
+    ) -> eyre::Result<MemorySlice, MemorySliceError> {
         let wasm_ptr = WasmPtr::<MemorySlicePtrBytes>::new(ptr);
         let memory_slice_ptr_bytes = wasm_ptr
             .deref(memory)
             .read()
-            .map_err(|err| MemoryError::ReadError(err))?;
+            .map_err(|err| MemorySliceError::ReadError(err))?;
         let memory_slice = MemorySlice::from_memory_slice_ptr_bytes(memory_slice_ptr_bytes);
 
         MemorySlice::validate(&memory_slice)?;
@@ -45,35 +57,40 @@ impl MemorySlice {
         Ok(memory_slice)
     }
 
-    /// Write the given data to the memory slice.
-    pub fn write(self, memory: &wasmer::MemoryView, data: &[u8]) -> eyre::Result<(), MemoryError> {
-        if data.len() > self.len as usize {
-            return Err(MemoryError::ExceedsMemorySize);
-        }
-
-        memory
-            .write(self.ptr as u64, data)
-            .map_err(|err| MemoryError::WriteError(err))?;
-
-        Ok(())
-    }
-
     /// Read the memory slice.
     pub fn read(
         self,
         memory: &wasmer::MemoryView,
         max_len: usize,
-    ) -> eyre::Result<Vec<u8>, MemoryError> {
+    ) -> eyre::Result<Vec<u8>, MemorySliceError> {
         if self.len as usize > max_len {
-            return Err(MemoryError::ExceedsMemorySize);
+            return Err(MemorySliceError::ExceedMemorySliceSize);
         }
 
         let mut data = vec![0u8; self.len as usize];
+
         memory
             .read(self.ptr as u64, &mut data)
-            .map_err(|err| MemoryError::ReadError(err))?;
+            .map_err(|err| MemorySliceError::ReadError(err))?;
 
         Ok(data)
+    }
+
+    /// Write the given data to the memory slice.
+    pub fn write(
+        self,
+        memory: &wasmer::MemoryView,
+        data: &[u8],
+    ) -> eyre::Result<(), MemorySliceError> {
+        if data.len() > self.len as usize {
+            return Err(MemorySliceError::ExceedMemorySliceSize);
+        }
+
+        memory
+            .write(self.ptr as u64, data)
+            .map_err(|err| MemorySliceError::WriteError(err))?;
+
+        Ok(())
     }
 
     /// Convert a `MemorySlicePtrBytes` to a `MemorySlice`.
@@ -85,13 +102,13 @@ impl MemorySlice {
     }
 
     /// Validate the memory slice.
-    fn validate(memory_slice: &MemorySlice) -> eyre::Result<(), MemoryError> {
+    fn validate(memory_slice: &MemorySlice) -> eyre::Result<(), MemorySliceError> {
         if memory_slice.ptr == 0 {
-            return Err(MemoryError::NullPointer);
+            return Err(MemorySliceError::NullPointer);
         }
 
-        if memory_slice.len > (u32::MAX - memory_slice.ptr) {
-            return Err(MemoryError::ExceedsMemorySize);
+        if memory_slice.len > (MAX_WASM_MEMORY_SIZE as u32 - memory_slice.ptr) {
+            return Err(MemorySliceError::ExceedMaxWASMMemorySize);
         }
 
         Ok(())

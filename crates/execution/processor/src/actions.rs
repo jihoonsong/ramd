@@ -1,8 +1,7 @@
 use std::sync::Arc;
 
 use ramd_db::storage::Storage;
-use ramd_vm::Context;
-use ramd_vm_runtime::Runner;
+use ramd_vm::Runtime;
 use tracing::{error, info};
 
 pub enum Action {
@@ -13,7 +12,7 @@ pub enum Action {
 impl Action {
     pub(crate) fn perform<S>(&self, cache: Arc<S>) -> eyre::Result<()>
     where
-        S: Storage<Vec<u8>, Vec<u8>>,
+        S: Storage<Vec<u8>, Vec<u8>> + 'static,
     {
         match self {
             Action::CreateLiveObject(action) => action.perform(cache),
@@ -51,7 +50,7 @@ pub struct ExecuteLiveObjectAction {
 impl ExecuteLiveObjectAction {
     fn perform<S>(&self, cache: Arc<S>) -> eyre::Result<()>
     where
-        S: Storage<Vec<u8>, Vec<u8>>,
+        S: Storage<Vec<u8>, Vec<u8>> + 'static,
     {
         let wasm_bytes = match cache.get(self.live_object_id.as_bytes().to_vec()) {
             Ok(wasm_bytes) => wasm_bytes,
@@ -61,8 +60,9 @@ impl ExecuteLiveObjectAction {
             }
         };
 
-        let context = Context::new(cache, wasm_bytes)?;
-        let result = Runner::new(context, self.method.clone(), self.args.clone()).run()?;
+        let mut runtime = Runtime::new(cache, wasm_bytes)?;
+        let result = runtime.run(self.method.clone(), self.args.clone())?;
+
         info!(target: "ramd::processor", "Called method `{}` to get result `{}`", self.method, result);
 
         info!(target: "ramd::processor", "Successfully performed execute action");
