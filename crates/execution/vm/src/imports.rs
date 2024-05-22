@@ -15,6 +15,7 @@ impl ImportObject {
             "env" => {
                 "storage_read" => Function::new_typed_with_env(&mut store, function_env, Self::storage_read),
                 "storage_write" => Function::new_typed_with_env(&mut store, function_env, Self::storage_write),
+                "storage_delete" => Function::new_typed_with_env(&mut store, function_env, Self::storage_delete),
             }
         };
 
@@ -64,6 +65,26 @@ impl ImportObject {
         context
             .storage
             .set(key, value)
+            .map_err(|err| wasmer::RuntimeError::new(err.to_string()))?;
+
+        Ok(())
+    }
+
+    /// Delete data from the storage.
+    fn storage_delete<S>(
+        mut env: FunctionEnvMut<Context<S>>,
+        key_ptr: MemorySlicePtr,
+    ) -> eyre::Result<(), wasmer::RuntimeError>
+    where
+        S: Storage<Vec<u8>, Vec<u8>> + 'static,
+    {
+        let (context, store) = env.data_and_store_mut();
+
+        let key = context.read_memory(&store, key_ptr)?;
+
+        context
+            .storage
+            .delete(key)
             .map_err(|err| wasmer::RuntimeError::new(err.to_string()))?;
 
         Ok(())
