@@ -26,7 +26,7 @@ impl Runtime {
         let module = Module::new(&store, live_object_info.wasm_bytes)?;
 
         // Create a function environment.
-        let function_env = FunctionEnv::new(&mut store, Context::new(storage));
+        let function_env = FunctionEnv::new(&mut store, Context::new(storage, live_object_info.id));
 
         // Create an import object.
         let import_object = ImportObject::new(&mut store, &function_env);

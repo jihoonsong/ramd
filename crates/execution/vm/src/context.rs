@@ -10,6 +10,7 @@ where
     S: Storage<Vec<u8>, Vec<u8>> + 'static,
 {
     pub storage: Arc<S>,
+    pub key_prefix: Vec<u8>,
     pub memory: Option<Memory>,
     pub allocate: Option<Function>,
 }
@@ -19,12 +20,19 @@ where
     S: Storage<Vec<u8>, Vec<u8>> + 'static,
 {
     /// Create a new `Context`.
-    pub fn new(storage: Arc<S>) -> Self {
+    pub fn new(storage: Arc<S>, key_prefix: String) -> Self {
         Self {
             storage,
+            key_prefix: key_prefix.as_bytes().to_vec(),
             memory: None,
             allocate: None,
         }
+    }
+
+    pub fn prefix_key(&self, mut key: Vec<u8>) -> Vec<u8> {
+        let mut prefixed_key = self.key_prefix.clone();
+        prefixed_key.append(&mut key);
+        prefixed_key
     }
 
     /// Read data from the WASM (guest) memory.

@@ -37,7 +37,7 @@ impl ImportObject {
 
         let has = context
             .storage
-            .has(key)
+            .has(context.prefix_key(key))
             .map_err(|err| wasmer::RuntimeError::new(err.to_string()))?;
 
         Ok(has as u32)
@@ -57,7 +57,7 @@ impl ImportObject {
 
         let value = context
             .storage
-            .get(key)
+            .get(context.prefix_key(key))
             .map_err(|err| wasmer::RuntimeError::new(err.to_string()))?;
 
         let value_ptr = context
@@ -85,7 +85,7 @@ impl ImportObject {
 
         context
             .storage
-            .set(key, value)
+            .set(context.prefix_key(key), value)
             .map_err(|err| wasmer::RuntimeError::new(err.to_string()))?;
 
         Ok(())
@@ -105,7 +105,7 @@ impl ImportObject {
 
         context
             .storage
-            .delete(key)
+            .delete(context.prefix_key(key))
             .map_err(|err| wasmer::RuntimeError::new(err.to_string()))?;
 
         Ok(())
