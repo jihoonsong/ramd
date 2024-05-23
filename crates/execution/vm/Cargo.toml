@@ -10,5 +10,9 @@ description = ""
 ramd-db.workspace = true
 
 eyre.workspace = true
+serde.workspace = true
+serde_json.workspace = true
 tracing.workspace = true
 wasmer.workspace = true
+sha3.workspace = true
+hex.workspace = true

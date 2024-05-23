@@ -1,6 +1,8 @@
 use std::sync::Arc;
 
-use crate::{Context, ImportObject, MemorySlice, MemorySlicePtr, MAX_WASM_MEMORY_SIZE};
+use crate::{
+    Context, ImportObject, LiveObjectInfo, MemorySlice, MemorySlicePtr, MAX_WASM_MEMORY_SIZE,
+};
 use ramd_db::storage::Storage;
 use tracing::info;
 use wasmer::{FunctionEnv, Instance, Module, Store, Value};
@@ -13,7 +15,7 @@ pub struct Runtime {
 
 impl Runtime {
     /// Create a new `Runtime`.
-    pub fn new<S>(storage: Arc<S>, wasm_bytes: Vec<u8>) -> eyre::Result<Self>
+    pub fn new<S>(storage: Arc<S>, live_object_info: LiveObjectInfo) -> eyre::Result<Self>
     where
         S: Storage<Vec<u8>, Vec<u8>> + 'static,
     {
@@ -21,7 +23,7 @@ impl Runtime {
         let mut store = Store::default();
 
         // Compile the WASM module.
-        let module = Module::new(&store, wasm_bytes)?;
+        let module = Module::new(&store, live_object_info.wasm_bytes)?;
 
         // Create a function environment.
         let function_env = FunctionEnv::new(&mut store, Context::new(storage));

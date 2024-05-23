@@ -87,8 +87,13 @@ tokio = { version = "1.28", features = [
     "time",
 ] }
 
-#p2p
+# p2p
 libp2p = "0.53.2"
+
+# vm
+wasmer = "4.3.0"
+sha3 = "0.10"
+hex = "0.4"
 
 # misc
 dotenv = "0.15.0"
@@ -96,4 +101,3 @@ base64 = "0.22.0"
 eyre = "0.6"
 serde_json = "1.0.94"
 serde = { version = "1.0", features = ["derive"] }
-wasmer = "4.3.0"
