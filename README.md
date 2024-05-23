@@ -26,6 +26,50 @@ ls
 
 If you encounter any issues, please feel free to [reach out](#contact) to us.
 
+## Testing `ramd`
+
+You can test `ramd` using shell scripts and example live objects located in [tests](./tests) directory. The original code of the examples can be found [here](https://github.com/jihoonsong/live-object-sdk).
+
+To test `ramd`, open a terminal and run:
+
+```
+make run-ramd
+```
+
+In another terminal, you can send JSON-RPC requests via cURL.
+
+### Sum Live Object
+
+To create a Sum live object, run:
+
+```
+./tests/live-object-create.sh sum
+```
+
+To execute the Sum live object and sum two integers, run:
+
+```
+./tests/live-object-execute.sh sum 3 4 
+```
+
+You can replace `3` and `4` with any integers you'd like.
+
+### GCounter Live Object
+
+To create a GCounter live object, run:
+
+```
+./tests/live-object-create.sh gcounter
+```
+
+To execute the GCounter live object and add an integer, run:
+
+```
+./tests/live-object-execute.sh gcounter 1
+```
+
+You can replace `1` with any non-negative integer you'd like.
+
 ## Contributing
 
 We are committed to community-driven development and welcome feedback and contributions from anyone on the internet!
