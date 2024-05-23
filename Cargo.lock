@@ -3384,6 +3384,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "ramd-cache"
+version = "0.1.0"
+dependencies = [
+ "eyre",
+ "ramd-db",
+]
+
+[[package]]
 name = "ramd-config"
 version = "0.1.0"
 dependencies = [
@@ -3495,6 +3503,7 @@ name = "ramd-processor"
 version = "0.1.0"
 dependencies = [
  "eyre",
+ "ramd-cache",
  "ramd-db",
  "ramd-vm",
  "serde",

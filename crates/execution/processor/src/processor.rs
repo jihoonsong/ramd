@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use crate::message::Message;
+use ramd_cache::{Cache, InMemoryCache};
 use ramd_db::storage::Storage;
 use tracing::error;
 
@@ -20,8 +21,7 @@ where
     }
 
     pub fn process_messages(&self, messages: &[Message]) {
-        // TODO: use cache that wraps around storage.
-        let cache = self.storage.clone();
+        let cache = Arc::new(InMemoryCache::new(self.storage.clone()));
 
         // TODO: add to messsage pool and then process messages.
 
@@ -33,6 +33,9 @@ where
             }
         }
 
-        // TODO: cache.commit();
+        if let Err(err) = cache.commit() {
+            error!(target: "ramd::processor", "Failed to commit cache with error `{}`", err.to_string());
+            return;
+        }
     }
 }

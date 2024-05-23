@@ -1,5 +1,5 @@
 [package]
-name = "ramd-processor"
+name = "ramd-cache"
 authors.workspace = true
 version.workspace = true
 edition.workspace = true
@@ -7,11 +7,6 @@ license.workspace = true
 description = ""
 
 [dependencies]
-ramd-cache.workspace = true
 ramd-db.workspace = true
-ramd-vm.workspace = true
 
 eyre.workspace = true
-tracing.workspace = true
-serde.workspace = true
-serde_json.workspace = true
