@@ -1,9 +1,9 @@
 [package]
 name = "ramd-vm"
-authors.workspace = true
+authors = ["Jihoon Song <jihoonsong.dev@gmail.com>"]
 version.workspace = true
 edition.workspace = true
-license.workspace = true
+license = "GPLv3"
 description = ""
 
 [dependencies]

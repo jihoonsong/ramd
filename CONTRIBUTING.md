@@ -19,7 +19,7 @@ If you have an idea and cannot find a related issue, feel free to open one. Befo
 - Is the issue being proposed clearly explained?
 - Is the issue important and sufficiently prepared to ask the community to spend time reviewing?
 
-Please avoid opening issues to ask questions. Instead, use our [Discord](https://discord.gg/hMsQas3Vw9) for inquiries.
+Please avoid opening issues to ask questions.
 
 ## Opening a Pull Request
 

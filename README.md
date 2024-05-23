@@ -24,8 +24,6 @@ cd $HOME/{RAMD_DIR_NAME}
 ls
 ```
 
-If you encounter any issues, please feel free to [reach out](#contact) to us.
-
 ## Testing `ramd`
 
 You can test `ramd` using shell scripts and example live objects located in [tests](./tests) directory. The original code of the examples can be found [here](https://github.com/jihoonsong/live-object-sdk).
@@ -76,10 +74,8 @@ We are committed to community-driven development and welcome feedback and contri
 
 If you're interested in collaborating with us, please refer to [CONTRIBUTING.md](./CONTRIBUTING.md) for more details.
 
-## Contact
-
-You can join our [Discord](https://discord.gg/hMsQas3Vw9) to ask questions or engage in discussions.
-
 ## License
 
-RAM monorepo is licensed under the MIT License.
+All code inside [vm](./crates/execution/vm) directory is licensed under the GNU General Public License v3.0, which can be found in the [LICENSE.GPLv3](./LICENSE.GPLv3) file.
+
+Other code is licensed under the MIT License, which can be found in the [LICENSE.MIT](./LICENSE.MIT) file.
