@@ -11,7 +11,7 @@ pub struct Message {
 }
 
 impl Message {
-    pub(crate) fn process<S>(&self, cache: Arc<S>) -> eyre::Result<()>
+    pub(crate) fn process<S>(&self, cache: Arc<S>) -> eyre::Result<String>
     where
         S: Storage<Vec<u8>, Vec<u8>> + 'static,
     {

@@ -3,6 +3,7 @@ use std::sync::Arc;
 use crate::message::Message;
 use ramd_cache::{Cache, InMemoryCache};
 use ramd_db::storage::Storage;
+use serde_json::json;
 use tracing::error;
 
 pub struct Processor<S>
@@ -20,22 +21,32 @@ where
         Self { storage }
     }
 
-    pub fn process_messages(&self, messages: &[Message]) {
+    pub fn process_messages(&self, messages: &[Message]) -> String {
         let cache = Arc::new(InMemoryCache::new(self.storage.clone()));
 
         // TODO: add to messsage pool and then process messages.
 
+        let mut results = json!({});
+
         for message in messages {
-            if let Err(err) = message.process(cache.clone()) {
-                // TODO: log message ID.
-                error!(target: "ramd::processor", "Failed to process a message with error `{}`", err.to_string());
-                return;
+            match message.process(cache.clone()) {
+                Ok(result) => {
+                    // TODO: set result as a value of the message ID. Until we have message ID, we return the final result.
+                    results = json!(result);
+                }
+                Err(err) => {
+                    // TODO: log message ID.
+                    error!(target: "ramd::processor", "Failed to process a message with error `{}`", err.to_string());
+                    return err.to_string();
+                }
             }
         }
 
         if let Err(err) = cache.commit() {
             error!(target: "ramd::processor", "Failed to commit cache with error `{}`", err.to_string());
-            return;
+            return err.to_string();
         }
+
+        results.to_string()
     }
 }

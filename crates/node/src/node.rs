@@ -28,7 +28,7 @@ impl<S> LiveObjectHandler for Node<S>
 where
     S: Storage<Vec<u8>, Vec<u8>>,
 {
-    fn create_live_object(&self, wasm_bytes: Vec<u8>) {
+    fn create_live_object(&self, wasm_bytes: Vec<u8>) -> String {
         let messages = vec![Message {
             action: Action::CreateLiveObject(CreateLiveObjectAction { wasm_bytes }),
         }];
@@ -36,10 +36,10 @@ where
         // TODO: log message ID.
         info!(target: "ramd::node", "New message with create action");
 
-        self.processor.process_messages(&messages);
+        self.processor.process_messages(&messages)
     }
 
-    fn execute_live_object(&self, live_object_id: String, method: String, args: Vec<u8>) {
+    fn execute_live_object(&self, live_object_id: String, method: String, args: Vec<u8>) -> String {
         let messages = vec![Message {
             action: Action::ExecuteLiveObject(ExecuteLiveObjectAction {
                 live_object_id,
@@ -51,6 +51,6 @@ where
         // TODO: log message ID.
         info!(target: "ramd::node", "New message with execute action");
 
-        self.processor.process_messages(&messages);
+        self.processor.process_messages(&messages)
     }
 }

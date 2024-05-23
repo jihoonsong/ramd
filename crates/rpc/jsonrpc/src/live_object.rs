@@ -28,23 +28,19 @@ impl<H> LiveObjectApiServer for LiveObjectApi<H>
 where
     H: LiveObjectHandler + 'static,
 {
-    async fn create_live_object(&self, request: CreateLiveObject) -> RpcResult<()> {
+    async fn create_live_object(&self, request: CreateLiveObject) -> RpcResult<String> {
         info!(target: "ramd::jsonrpc", "Request to create a live object");
 
-        self.node.create_live_object(request.decode_wasm_bytes()?);
-
-        Ok(())
+        Ok(self.node.create_live_object(request.decode_wasm_bytes()?))
     }
 
-    async fn execute_live_object(&self, request: ExecuteLiveObject) -> RpcResult<()> {
+    async fn execute_live_object(&self, request: ExecuteLiveObject) -> RpcResult<String> {
         info!(target: "ramd::jsonrpc", "Request to execute a live object");
 
-        self.node.execute_live_object(
+        Ok(self.node.execute_live_object(
             request.live_object_id,
             request.method,
             request.args.as_bytes().to_vec(),
-        );
-
-        Ok(())
+        ))
     }
 }

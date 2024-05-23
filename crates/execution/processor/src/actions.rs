@@ -10,7 +10,7 @@ pub enum Action {
 }
 
 impl Action {
-    pub(crate) fn perform<S>(&self, cache: Arc<S>) -> eyre::Result<()>
+    pub(crate) fn perform<S>(&self, cache: Arc<S>) -> eyre::Result<String>
     where
         S: Storage<Vec<u8>, Vec<u8>> + 'static,
     {
@@ -26,15 +26,16 @@ pub struct CreateLiveObjectAction {
 }
 
 impl CreateLiveObjectAction {
-    fn perform<S>(&self, cache: Arc<S>) -> eyre::Result<()>
+    fn perform<S>(&self, cache: Arc<S>) -> eyre::Result<String>
     where
         S: Storage<Vec<u8>, Vec<u8>>,
     {
         let live_object_info = LiveObjectInfo::new(self.wasm_bytes.clone());
-        info!(target: "ramd::processor", "Successfully created live object with id `{}`", live_object_info.id);
+        let live_object_id = live_object_info.id.clone();
+        info!(target: "ramd::processor", "Successfully created live object with id `{}`", live_object_id);
 
         if let Err(e) = cache.set(
-            live_object_info.id.as_bytes().to_vec(),
+            live_object_id.as_bytes().to_vec(),
             live_object_info.try_into()?,
         ) {
             error!(target: "ramd::processor", "Failed to store the created live object with error `{}`", e.to_string());
@@ -42,7 +43,7 @@ impl CreateLiveObjectAction {
         }
 
         info!(target: "ramd::processor", "Successfully performed create action");
-        Ok(())
+        Ok(live_object_id)
     }
 }
 
@@ -53,7 +54,7 @@ pub struct ExecuteLiveObjectAction {
 }
 
 impl ExecuteLiveObjectAction {
-    fn perform<S>(&self, cache: Arc<S>) -> eyre::Result<()>
+    fn perform<S>(&self, cache: Arc<S>) -> eyre::Result<String>
     where
         S: Storage<Vec<u8>, Vec<u8>> + 'static,
     {
@@ -72,6 +73,6 @@ impl ExecuteLiveObjectAction {
         info!(target: "ramd::processor", "Successfully called method `{}` to get result `{}`", self.method, result);
 
         info!(target: "ramd::processor", "Successfully performed execute action");
-        Ok(())
+        Ok(result)
     }
 }
